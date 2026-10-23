@@ -267,10 +267,10 @@ Drawing tip: use a sprite / off-screen buffer and push whole frames to avoid fli
   for any DJ: rekordbox, Serato, CDJs or vinyl. That makes it the sellable version.
 - **Digital option:** S/PDIF out on some club mixers, via an S/PDIF receiver chip → I2S.
 - **Club track info:** Pioneer CDJs share track data over Pro DJ Link; the open-source
-  beat-link project reads it. Research later.
+  beat-link project reads it. Research later. Not sure if we want to have software messing with CDJs, as i dont want it to be faulty and cause issues.
 
 ### Distribution
-- **Port the host to Rust or C** once the design is stable, for one small executable
+- **Port the host to Rust or C** once the design is stable, for one small executable as it's easier for laypeople to install (DJs who might just want to plug and play this piece of equipment and software)
   with no Python install and a few MB of RAM instead of ~50 MB.
   - Rust: `cpal` (audio) + `rustfft` + `serialport`.
   - C: `miniaudio` (audio, incl. Windows WASAPI loopback) + `kissfft` / `pffft`

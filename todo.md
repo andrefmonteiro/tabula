@@ -18,7 +18,7 @@ Each ticket has a "done when" so you know when to stop.
   - Done when: you know which display library to use
 
 ## M1 — Capture
-- [ ] **T-10** Script lists audio devices
+- [x] **T-10** Script lists audio devices
   - Done when: BlackHole appears in the list
 - [ ] **T-11** Open a BlackHole input stream and print a live level meter in the terminal
   - Done when: meter moves with music from any app (e.g. YouTube)

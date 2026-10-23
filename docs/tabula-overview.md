@@ -1,6 +1,6 @@
-# DJ Display — Project Overview
+# Tabula — Project Overview
 
-> Working name. A small touchscreen device for the DJ booth that shows a live
+> A small touchscreen device for the DJ booth that shows a live
 > frequency spectrum of the music, driven by the DJ's laptop over a USB cable.
 > Long-term: a "tablet" of DJ tools and crowd-facing visuals.
 

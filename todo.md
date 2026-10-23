@@ -4,12 +4,12 @@ How to use: pick the first unchecked ticket, do it, tick it, commit.
 Each ticket has a "done when" so you know when to stop.
 
 ## Now
-→ T-01
+→ T-02
 
 ---
 
 ## M0 — Setup
-- [ ] **T-01** Clone repo, create `host/`, `firmware/`, `docs/`
+- [x] **T-01** Clone repo, create `host/`, `firmware/`, `docs/`
 - [ ] **T-02** Add design doc to `docs/` and create `CLAUDE.md` pointing to it
 - [ ] **T-03** Python venv + `sounddevice numpy pyserial`, add `.gitignore`
 - [ ] **T-04** Install BlackHole, create Multi-Output Device (FLX4 + BlackHole)

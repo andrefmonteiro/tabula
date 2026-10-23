@@ -1,0 +1,12 @@
+# Python virtual environment (recreate with: python3 -m venv .venv)
+.venv/
+
+# Python bytecode caches
+__pycache__/
+*.pyc
+
+# macOS Finder metadata
+.DS_Store
+
+# PlatformIO build output (firmware, from T-05 on)
+.pio/

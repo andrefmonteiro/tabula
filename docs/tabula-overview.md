@@ -43,7 +43,7 @@ Device
 ### Hardware owned
 | Part | Notes |
 |---|---|
-| **Freenove ESP32-S3 Display CYD, 2.8" IPS touch, 240×320** | Main board + screen. Used landscape: 320×240. |
+| **Freenove ESP32-S3 Display CYD, 2.8" IPS touch, 240×320** (FNK0104B) | Main board + screen. Used landscape: 320×240. Specs in §7. |
 | AZDelivery female-to-female jumper wires (40 pcs) | Future: sensor wiring |
 | DHT22 temperature + humidity module (ESP-01S style) | Future: booth climate app. Not used in MVP. |
 
@@ -209,7 +209,8 @@ audio buffering. Python makes tuning the DSP fast. Its cost is size (interpreter
 | Need | Choice | Notes |
 |---|---|---|
 | Framework | **Arduino (C/C++)** via PlatformIO or Arduino IDE | Matches the Spotify display project. |
-| Display + touch | **LovyanGFX** or **TFT_eSPI** | Pick after confirming this board's display and touch driver chips. |
+| Display | **TFT_eSPI 2.5.43** (`bodmer/TFT_eSPI`) | ILI9341 driver. Same library + settings as Freenove's own examples; settings go in `platformio.ini` build flags (see §7). |
+| Touch | **FT6336U** library (Freenove) or a small `Wire` driver | TFT_eSPI's touch support is for resistive panels only; this board's touch is a capacitive I2C chip. |
 | Serial | ESP32-S3 native USB (CDC) | Same cable powers the board. |
 
 Drawing tip: use a sprite / off-screen buffer and push whole frames to avoid flicker.
@@ -227,10 +228,69 @@ Drawing tip: use a sprite / off-screen buffer and push whole frames to avoid fli
 
 ---
 
-## 7. Open questions (verify during the MVP)
+## 7. Board specs and open questions
 
-- This board's **display and touch driver chips**, which pins are free, and whether
-  it has a **microSD slot** (check Freenove's docs/tutorial).
+### Board specs (answered in T-06)
+
+Source: Freenove's repo for this board, [Freenove_ESP32_S3_Display](https://github.com/Freenove/Freenove_ESP32_S3_Display)
+(product FNK0104B), mainly `Schematic/2.8inch_ESP32-S3_Display_Schematic.pdf`,
+`Libraries/FNK0104AB/TFT_eSPI_Setups_v1.3.zip` and the `Tutorial_With_Touch` sketches.
+The same board is also sold as LCDWiki **ES3C28P**, so docs for that name apply too.
+
+| Part | Chip / value | Notes |
+|---|---|---|
+| MCU | **ESP32-S3R8** | 8 MB **octal (OPI)** PSRAM inside the chip. |
+| Flash | 25VQ128, **16 MB** | |
+| Display | **ILI9341V**, 240×320 IPS, SPI | |
+| Touch | **FT6336G** capacitive, I2C address `0x38` | Shares the I2C bus with the audio codec (`0x18`). |
+| USB | **Native USB** (GPIO19/20), no USB-UART chip | Serial over the cable is USB CDC. Port shows up as `/dev/cu.usbmodem*` on macOS; Espressif USB vendor ID `0x303A` (for T-32 auto-detect). |
+| microSD | **Yes**, 4-bit SDMMC | Usable for the artwork cache (§8). |
+| Also on board | ES8311 audio codec + MEMS mic + speaker amp, WS2812 RGB LED, battery charger + battery ADC, BOOT key | Mic/codec stay unused (principle 4). The codec's ADC is wired to the mic, so it is not a ready-made line-in. |
+
+**Display settings** (copied from Freenove's `FNK0104AB_2.8_240x320_ILI9341.h`; the
+colour/inversion flags are the ones that give wrong colours when lost):
+
+```
+ILI9341_2_DRIVER   TFT_RGB_ORDER=TFT_BGR   TFT_INVERSION_ON   USE_HSPI_PORT
+TFT_WIDTH=240  TFT_HEIGHT=320  SPI_FREQUENCY=40000000
+TFT_MISO=13  TFT_MOSI=11  TFT_SCLK=12  TFT_CS=10  TFT_DC=46  TFT_RST=-1 (tied to EN)
+TFT_BL=45 (backlight, HIGH = on)
+```
+
+Freenove's bundled TFT_eSPI 2.5.43 is upstream 2.5.43 plus extra files for their
+3.5" model only, so upstream `bodmer/TFT_eSPI@2.5.43` works for this board.
+
+**Pin map**
+
+| Use | GPIO |
+|---|---|
+| Display SPI | 10 CS, 11 MOSI, 12 SCLK, 13 MISO, 46 DC, 45 backlight |
+| Touch (FT6336) | 16 SDA, 15 SCL, 18 RST, 17 INT |
+| microSD (SDMMC) | 38 CLK, 40 CMD, 39 D0, 41 D1, 48 D2, 47 D3 |
+| Audio codec I2S | 4 MCLK, 5 BCLK, 7 WS, 6 DIN, 8 DOUT, 1 amp enable |
+| RGB LED (WS2812) | 42 |
+| Battery ADC | 9 |
+| BOOT key | 0 |
+| Native USB | 19 D−, 20 D+ |
+| **Reserved** | 26–32 flash, 33–37 octal PSRAM (look unconnected on the schematic, but are not free) |
+
+**Free pins**
+- Header **P3 "Expanded IO"**: GPIO **2, 3, 14, 21**. GPIO3 is a strapping pin:
+  nothing wired to it may pull it high/low at boot.
+- Header **P2 "UART"**: GPIO **43 (TX), 44 (RX)**. Free, because serial goes over native USB.
+- Header **P4 "IIC"**: the shared I2C bus (SDA 16, SCL 15) + 3V3/GND. I2C sensors can
+  hang off it as long as their address isn't `0x18` or `0x38`.
+- **Budget:** the v2 I2S ADC (§8) needs ~4 GPIOs and the DHT22 needs 1. That is more
+  than P3 alone, so plan to use P2's 43/44 too.
+
+**For the firmware (T-30):**
+- `platformio.ini` needs `-DARDUINO_USB_CDC_ON_BOOT=1`; without it `Serial` goes to
+  the UART header and nothing shows up over the USB cable.
+- Set the board to 16 MB flash and OPI PSRAM (check the exact PlatformIO keys then).
+  A full-screen sprite (T-40) is 320×240×2 ≈ 150 KB, so PSRAM matters.
+
+### Open questions (verify during the MVP)
+
 - Does a **Multi-Output Device** play nicely with rekordbox + FLX4 cue routing?
   If not: aggregate device, or capture via macOS Core Audio process taps.
 

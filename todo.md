@@ -4,13 +4,13 @@ How to use: pick the first unchecked ticket, do it, tick it, commit.
 Each ticket has a "done when" so you know when to stop.
 
 ## Now
-→ T-02
+→ First one unticked.
 
 ---
 
 ## M0 — Setup
 - [x] **T-01** Clone repo, create `host/`, `firmware/`, `docs/`
-- [ ] **T-02** Add design doc to `docs/` and create `CLAUDE.md` pointing to it
+- [x] **T-02** Add design doc to `docs/` and create `CLAUDE.md` pointing to it
 - [ ] **T-03** Python venv + `sounddevice numpy pyserial`, add `.gitignore`
 - [ ] **T-04** Install BlackHole, create Multi-Output Device (FLX4 + BlackHole)
 - [ ] **T-05** Install PlatformIO extension in VS Code
@@ -63,7 +63,7 @@ Each ticket has a "done when" so you know when to stop.
 ---
 
 ## Backlog
-See `docs/dj-display-overview.md` §8 (Future features).
+See `docs/tabula-overview.md` §8 (Future features).
 
 ## Done log
 <!-- Optional: date + ticket + one line on what you learned -->

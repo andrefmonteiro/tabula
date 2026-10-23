@@ -1,0 +1,5 @@
+# Host dependencies. Install into the venv with:
+#   python -m pip install -r host/requirements.txt
+sounddevice  # audio capture (PortAudio, bundled in the wheel on macOS/Windows)
+numpy        # FFT and array maths
+pyserial     # USB serial to the board (imported as `serial`)

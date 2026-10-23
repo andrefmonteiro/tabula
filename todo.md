@@ -13,7 +13,7 @@ Each ticket has a "done when" so you know when to stop.
 - [x] **T-02** Add design doc to `docs/` and create `CLAUDE.md` pointing to it
 - [x] **T-03** Python venv + `sounddevice numpy pyserial`, add `.gitignore`
 - [x] **T-04** Install BlackHole, create Multi-Output Device (FLX4 + BlackHole)
-- [ ] **T-05** Install PlatformIO extension in VS Code
+- [x] **T-05** Install PlatformIO extension in VS Code
 - [ ] **T-06** Find board specs (display driver, touch chip, free pins, microSD?) → add to doc §7
   - Done when: you know which display library to use
 

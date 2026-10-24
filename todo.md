@@ -20,7 +20,7 @@ Each ticket has a "done when" so you know when to stop.
 ## M1 — Capture
 - [x] **T-10** Script lists audio devices
   - Done when: BlackHole appears in the list
-- [ ] **T-11** Open a BlackHole input stream and print a live level meter in the terminal
+- [x] **T-11** Open a BlackHole input stream and print a live level meter in the terminal
   - Done when: meter moves with music from any app (e.g. YouTube)
 - [ ] **T-12** Route rekordbox through the Multi-Output Device and test a real mix
   - Done when: meter moves, speakers play, headphone cue still works

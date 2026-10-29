@@ -4,6 +4,17 @@
 > frequency spectrum of the music, driven by the DJ's laptop over a USB cable.
 > Long-term: a "tablet" of DJ tools and crowd-facing visuals.
 
+## Contents
+1. [What we're building](#1-what-were-building)
+2. [The connecting pieces (MVP)](#2-the-connecting-pieces-mvp)
+3. [Audio analysis: defaults and why](#3-audio-analysis-defaults-and-why)
+4. [Data and messages (MVP)](#4-data-and-messages-mvp)
+5. [Tech stack (MVP)](#5-tech-stack-mvp)
+6. [MVP milestones](#6-mvp-milestones)
+7. [Board specs and open questions](#7-board-specs-and-open-questions)
+8. [Future features](#8-future-features)
+9. [Notes for Claude (assistant working conventions)](#9-notes-for-claude-assistant-working-conventions)
+
 ---
 
 ## 1. What we're building
@@ -172,7 +183,7 @@ Every message uses the same simple frame:
 | 0x02 | SpectrumFrame |
 | 0x20 | Heartbeat |
 | 0x10–0x1F | Reserved: track info / artwork (future) |
-| 0x80+ | Reserved: device → host messages (future) |
+| 0x80+ | Reserved: device → host messages (future), e.g. touch buttons for rekordbox control (§8) |
 
 **Bandwidth check:** 32 bars × ~50 fps ≈ 1.6 KB/s of payload. That is tiny for USB serial.
 
@@ -318,9 +329,36 @@ Freenove's bundled TFT_eSPI 2.5.43 is upstream 2.5.43 plus extra files for their
 - **Booth climate (DJ Helper):** DHT22 temperature + humidity, wired with the jumper wires.
 - **Track info (DJ Helper):** title, artist, BPM, key. How to get "now playing"
   out of rekordbox is still to research. (Time remaining is skipped since rekordbox already shows it.)
+  Skins and artwork theming (below) depend on the same "now playing" data.
+- **rekordbox control pad (DJ Helper):** touch buttons on the board that trigger
+  rekordbox actions.
+  - **How:** the board sends "button X pressed" to the host over the existing serial
+    link (device → host types `0x80+`, §4). The host turns it into MIDI messages on a
+    **virtual MIDI port** (software on the laptop: no cable, and the FLX4 isn't
+    involved). rekordbox maps that port with MIDI Learn, like a second controller.
+  - **Macros:** one button can send several MIDI messages, e.g. move two filters at
+    once. A **band-pass** needs two effects together, because rekordbox's channel
+    FILTER knob is low-pass one way and high-pass the other (e.g. channel filter +
+    a Beat FX filter). Exact mapping to research.
+  - **To verify:** whether rekordbox lets you MIDI-map a second, non-Pioneer device
+    next to the FLX4.
+  - New host dependency (`mido` + `python-rtmidi`), so weigh it per §9.
+  - Alternative: the ESP32-S3's native USB could show up as a USB-MIDI device itself
+    (TinyUSB), with no host translation. Not preferred: it complicates the one USB
+    port that also carries the serial link.
 - **Public mode apps:** big crowd-facing visualizer, now playing + artwork, DJ name / logo.
 - **Zoom:** focus the analyzer on part of the spectrum (e.g. 30–300 Hz for kick vs. bass).
   Just different `min_freq` / `max_freq` values.
+- **EQ band overlay (Spectrum):** tint or draw lines to show which frequency ranges
+  the mixer's LOW / MID / HIGH knobs affect.
+  - With the FLX4, the EQ is **rekordbox's software EQ**, so the ranges come from
+    rekordbox and its **EQ vs. ISOLATOR** setting, not from the controller. Hardware
+    mixers (club DJMs) each have their own crossover points. Exact frequencies: to research.
+  - The ranges are **settings** (principle 6): picked once on first connect from
+    presets ("rekordbox EQ", "rekordbox ISO", per mixer), with a custom option.
+  - Stored in the **board's flash** (ESP32 NVS / `Preferences`), so they survive
+    unplugging and also work host-less (hardware v2). The host sends them once
+    during setup, as a new config message type.
 
 ### Artwork + on-board cache
 - Host reads artwork from the track's file tags, resizes to the screen, sends JPEG chunks.
@@ -333,6 +371,24 @@ Freenove's bundled TFT_eSPI 2.5.43 is upstream 2.5.43 plus extra files for their
 - A folder of files named by key is enough; no database needed.
 - Small gain over USB (sending is already fast). Big gain for wireless transport
   and for host-less mode.
+
+### Skins and artwork theming
+- **Skins / colour modes:** a setting for the colour scheme (principle 6).
+- **"Use artwork whenever available":** fallback chain
+  1. the track's artwork as the background (dimmed or blurred, so bars and labels
+     stay readable);
+  2. else a **palette taken from the artwork** (bars, grid, accents);
+  3. else the user's chosen skin.
+- The palette comes from the artwork image itself: the host shrinks it to a few
+  pixels and picks the dominant colours with numpy (no new dependency). No artwork
+  means no palette, so the chosen skin is always the last fallback.
+- Reuses the artwork pipeline and cache above.
+- **Depends on knowing the track that's playing.** Candidate sources, all to research:
+  - reading rekordbox's window: macOS accessibility API or screen OCR (a hack, may
+    break when rekordbox updates);
+  - rekordbox's own history / database files (`pyrekordbox` reads them), which may
+    only update after a track has played for a while;
+  - Pro DJ Link from CDJs: club setups only (see hardware v2 below).
 
 ### Hardware v2: line-in (host-less)
 - Add an **I2S ADC module** (e.g. PCM1808) to the board's spare pins, so the board

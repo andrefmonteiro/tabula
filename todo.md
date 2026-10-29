@@ -64,6 +64,8 @@ Each ticket has a "done when" so you know when to stop.
 
 ## Backlog
 See `docs/tabula-overview.md` §8 (Future features).
+- [ ] README: back "lightweight" with numbers (host CPU %, RAM, install/bundle size
+  on a MacBook Air M1). Do after M5, when there's a full host to measure.
 
 ## Done log
 <!-- Optional: date + ticket + one line on what you learned -->

@@ -67,6 +67,10 @@ Each ticket has a "done when" so you know when to stop.
 See `docs/tabula-overview.md` §8 (Future features).
 - [ ] README: back "lightweight" with numbers (host CPU %, RAM, install/bundle size
   on a MacBook Air M1). Do after M5, when there's a full host to measure.
+- [ ] At the DJ setup: create "MacBook Speakers + BlackHole" (recipe in doc §5) and
+  check the capture works there too. Also check whether the FLX4's MASTER LEVEL knob
+  changes the volume with (a) just the MacBook speakers as the Mac's output and
+  (b) the Multi-Output Device. Write the result in doc §5.
 
 ## Done log
 <!-- Optional: date + ticket + one line on what you learned -->

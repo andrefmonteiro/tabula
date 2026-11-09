@@ -22,9 +22,10 @@ Each ticket has a "done when" so you know when to stop.
   - Done when: BlackHole appears in the list
 - [x] **T-11** Open a BlackHole input stream and print a live level meter in the terminal
   - Done when: meter moves with music from any app (e.g. YouTube)
-- [ ] **T-12** Route rekordbox through the Multi-Output Device and test a real mix
+- [x] **T-12** Route rekordbox through the Multi-Output Device and test a real mix
   - Done when: meter moves, speakers play, headphone cue still works
-- [ ] **T-13** (only if T-12 breaks cueing) Try an aggregate device; write down what works
+- [x] **T-13** (only if T-12 breaks cueing) Try an aggregate device; write down what works
+  - Not needed: cueing works (recipe in doc §5)
 
 ## M2 — Analyze
 - [ ] **T-20** Buffer samples: 4096-sample window, new frame every 1024 samples

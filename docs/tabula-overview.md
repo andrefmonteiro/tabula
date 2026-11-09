@@ -51,8 +51,9 @@ Device
 - **rekordbox** on a **MacBook Air M1**
 - **Actual DJ setup today:** master plays through the **MacBook's built-in speakers**;
   the FLX4 is used for the **headphone cue** only (its RCA master out is unused).
-  rekordbox does this with its own "rekordbox Aggregate Device" (FLX4's 4 outs +
-  MacBook speakers' 2 outs = 6 outs). See §7 for what that means for capture.
+  rekordbox does this with its "PC MASTER OUT" option, which builds a
+  "rekordbox Aggregate Device" from the FLX4 + **whatever the Mac's sound output
+  is**. That's what makes capture work (§5, §7).
 - Must later run on **Windows** (and ideally Linux) too
 
 ### Hardware owned
@@ -212,12 +213,23 @@ audio buffering. Python makes tuning the DSP fast. Its cost is size (interpreter
 ~50 MB RAM, bulky to ship), which the Rust/C port in §8 solves later.
 
 **Getting rekordbox's audio (the main platform difference):**
-- **macOS:** install **BlackHole** (free virtual audio device) and create a
-  Multi-Output Device in *Audio MIDI Setup* (FLX4 + BlackHole). The host reads
-  from BlackHole. ⚠️ Must verify this keeps rekordbox's FLX4 headphone cue
-  working (master vs. cue channels): the first thing to test in Milestone 1.
-  ⚠️ This assumes the master leaves through the FLX4's RCA out. In the current
-  DJ setup (master on the MacBook speakers, §1) it doesn't; see §7.
+- **macOS (verified in T-12):** install **BlackHole** (free virtual audio device).
+  In *Audio MIDI Setup*, create a Multi-Output Device **"MacBook Speakers +
+  BlackHole"** (primary: the speakers; drift correction on BlackHole only) and
+  make it the **Mac's sound output**. In rekordbox, *Preferences → Audio*, switch
+  "Output audio from the computer's built-in speakers…" (PC MASTER OUT) **off and
+  on again** so it rebuilds its aggregate device. rekordbox's Master Output then
+  reads "DDJ-FLX4 : MASTER + <that device>": the master plays on the speakers and
+  into BlackHole, the cue stays on the FLX4 phones. The host reads from BlackHole.
+  - Audio MIDI Setup shows the Multi-Output Device inside rekordbox's aggregate
+    as "Offline Device". Harmless: it works anyway.
+  - Volume: neither the Mac's volume keys nor the FLX4's MASTER LEVEL knob change
+    it (Multi-Output Devices have no volume control). Workaround: set the speakers'
+    own volume first, or with the per-device slider in the Multi-Output Device.
+    BlackHole stays at full level either way, so Tabula's readings don't depend on
+    how loud the room is.
+  - If the master ever goes out through the FLX4's RCA instead, use the "Tabula
+    Out" device (FLX4 + BlackHole) from T-04.
 - **Windows:** WASAPI loopback can capture the output device directly; no extra
   install expected. Exact library support to be confirmed in the Windows milestone.
 - **Linux:** PulseAudio/PipeWire "monitor" source of the output device.
@@ -308,18 +320,14 @@ Freenove's bundled TFT_eSPI 2.5.43 is upstream 2.5.43 plus extra files for their
 
 ### Open questions (verify during the MVP)
 
-- **How to capture the master in the actual DJ setup (T-12/T-13)?**
-  rekordbox plays to *one* audio device, and that device must carry the FLX4 cue
-  (headphones), the master to the MacBook speakers, *and* a copy into BlackHole.
-  The "Tabula Out" Multi-Output Device (FLX4 + BlackHole, made in T-04) sends the
-  master to the FLX4's unused RCA out, so on its own it gives a meter but no sound.
-  Options to try, in order:
-  1. **Own Aggregate Device: FLX4 + MacBook Speakers + BlackHole.** Only works if
-     rekordbox can send the master to two channel pairs at once (unknown).
-  2. **macOS Core Audio process taps** (macOS 14.2+): capture rekordbox's own output,
-     no BlackHole. Needs native macOS code, and must not pick up the cue mix.
-  3. **Powered speaker on the FLX4's RCA master out:** then "Tabula Out" works as
-     designed. Simplest, if the hardware is there.
+- ~~How to capture the master in the actual DJ setup?~~ **Answered in T-12:**
+  make the Mac's sound output a Multi-Output Device with BlackHole, and rekordbox's
+  PC MASTER OUT picks it up (recipe in §5). Master on speakers, meter moving and
+  headphone cue all confirmed (tested with "TV + BlackHole" at the desk).
+  - Still to confirm at the DJ setup: the same with "MacBook Speakers + BlackHole",
+    and whether the FLX4's MASTER LEVEL knob does anything there.
+  - Fallback if a future rekordbox update breaks this: macOS Core Audio process
+    taps (macOS 14.2+) to capture rekordbox's own output, no BlackHole.
 
 ---
 

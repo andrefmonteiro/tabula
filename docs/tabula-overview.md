@@ -359,6 +359,19 @@ Freenove's bundled TFT_eSPI 2.5.43 is upstream 2.5.43 plus extra files for their
   - Stored in the **board's flash** (ESP32 NVS / `Preferences`), so they survive
     unplugging and also work host-less (hardware v2). The host sends them once
     during setup, as a new config message type.
+- **Lyrics (app in both modes):** show the current line of the playing track,
+  karaoke-style (2–3 lines fit on 320×240). DJ Helper: small, with the next line
+  as a cue. Public: big crowd-facing text. Depends on Track info ("now playing")
+  being solved first. Open questions:
+  - **Source:** synced lyrics (`.lrc`, timestamped lines) from the file's tags or a
+    sidecar `.lrc` next to the track works offline. Online lookup (e.g. LRCLIB) would
+    need the network, so it can only be optional (design principle 2).
+  - **Timing:** synced lyrics need the track's play position, and rekordbox doesn't
+    obviously expose it. Also must handle tempo changes, loops and jumps.
+  - **Host vs. device:** host parses the `.lrc` and sends only the current line
+    (new message type in the reserved 0x10–0x1F range), so the board just draws text.
+  - **Rights:** fine for personal use; showing lyrics to a crowd or in a sold
+    product may need a licence. Check before shipping it.
 
 ### Artwork + on-board cache
 - Host reads artwork from the track's file tags, resizes to the screen, sends JPEG chunks.

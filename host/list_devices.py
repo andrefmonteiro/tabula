@@ -58,6 +58,10 @@ def main():
     # system defaults. -1 means "no default of that kind".
     default_in, default_out = sd.default.device
 
+    # Devices we could capture from. Computed up front so the table can mark
+    # them and the summary below can report them.
+    loopbacks = find_loopback_inputs(devices)
+
     # Column widths: size the name column to the longest name so rows line up.
     name_width = max(len(d["name"]) for d in devices)
     header = f"{'#':>3}  {'Name':<{name_width}}  {'In':>3}  {'Out':>3}  {'Rate (Hz)':>9}  API"
@@ -71,7 +75,9 @@ def main():
             flags.append("default input")
         if d["index"] == default_out:
             flags.append("default output")
-        if LOOPBACK_NAME in d["name"].lower():
+        # Same test as find_loopback_inputs(): the name alone isn't enough,
+        # e.g. the "TV + BlackHole" Multi-Output Device has 0 inputs.
+        if d in loopbacks:
             flags.append("<-- loopback")
 
         api_name = hostapis[d["hostapi"]]["name"]
@@ -85,7 +91,6 @@ def main():
 
     # Summary: answer T-10's actual question ("is BlackHole capturable?").
     print()
-    loopbacks = find_loopback_inputs(devices)
     if loopbacks:
         for d in loopbacks:
             print(

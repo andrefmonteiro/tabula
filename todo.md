@@ -26,6 +26,12 @@ Each ticket has a "done when" so you know when to stop.
   - Done when: meter moves, speakers play, headphone cue still works
 - [x] **T-13** (only if T-12 breaks cueing) Try an aggregate device; write down what works
   - Not needed: cueing works (recipe in doc §5)
+- [ ] **T-14** At the DJ setup: create "MacBook Speakers + BlackHole" (recipe in doc §5)
+  and test a real mix with it. Check whether the FLX4's MASTER LEVEL knob changes the
+  volume with (a) just the MacBook speakers as the Mac's output and (b) the
+  Multi-Output Device. Note any other difference from DJing on the speakers alone.
+  - Done when: doc §5 says whether this setup is fine for everyday DJing, or if
+    capture needs another route (e.g. process taps, doc §7)
 
 ## M2 — Analyze
 - [ ] **T-20** Buffer samples: 4096-sample window, new frame every 1024 samples
@@ -67,10 +73,6 @@ Each ticket has a "done when" so you know when to stop.
 See `docs/tabula-overview.md` §8 (Future features).
 - [ ] README: back "lightweight" with numbers (host CPU %, RAM, install/bundle size
   on a MacBook Air M1). Do after M5, when there's a full host to measure.
-- [ ] At the DJ setup: create "MacBook Speakers + BlackHole" (recipe in doc §5) and
-  check the capture works there too. Also check whether the FLX4's MASTER LEVEL knob
-  changes the volume with (a) just the MacBook speakers as the Mac's output and
-  (b) the Multi-Output Device. Write the result in doc §5.
 
 ## Done log
 <!-- Optional: date + ticket + one line on what you learned -->

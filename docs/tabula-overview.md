@@ -429,6 +429,17 @@ Freenove's bundled TFT_eSPI 2.5.43 is upstream 2.5.43 plus extra files for their
   - C: `miniaudio` (audio, incl. Windows WASAPI loopback) + `kissfft` / `pffft`
     + per-OS serial code (termios on macOS/Linux, Win32 on Windows).
 - **Windows (and Linux) host** support.
+- **Audio setup guide for users.** On macOS, Tabula only hears the music if the
+  user installs BlackHole, makes a Multi-Output Device the Mac's sound output, and
+  toggles rekordbox's PC MASTER OUT (§5). That's too many steps to expect from a
+  "plug and play" DJ, so:
+  - write a short per-OS setup guide (macOS: the §5 recipe; Windows: WASAPI
+    loopback, probably no setup; Linux: monitor source), with screenshots;
+  - have the host **detect a missing setup and say what to fix**, e.g. "BlackHole
+    not installed", or "BlackHole is silent while the board is connected: is the
+    Mac's output set to the Multi-Output Device?";
+  - long term, macOS process taps (§7) would remove the BlackHole steps entirely,
+    the strongest reason to try them.
 - **Optional WiFi transport** (UDP or WebSocket), same message format.
 
 ---
